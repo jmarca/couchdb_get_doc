@@ -1,0 +1,28 @@
+{
+  "name": "couchdb_get_doc",
+  "version": "0.0.1",
+  "description": "Boilerplate code to get a doc by id from couchdb",
+  "main": "lib/get_doc.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "should": "~1.2.2",
+    "superagent": "~0.14.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmarca/couchdb_get_doc"
+  },
+  "keywords": [
+    "couchdb",
+    "get"
+  ],
+  "author": "James E. Marca",
+  "license": "MIT",
+  "readmeFilename": "README.md"
+}
