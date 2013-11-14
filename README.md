@@ -10,7 +10,7 @@ The program is a function generator.  You call it with the name of the
 options object, including (required) the name of the db
 
 The program expects that the url, port, username, password are in
-environment variables.  If not, put them in the initializatin object
+environment variables.  If not, put them in the initialization object
 
 
 The code says it all:

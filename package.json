@@ -7,10 +7,11 @@
     "test": "test"
   },
   "dependencies": {
-    "should": "~1.2.2",
-    "superagent": "~0.14.2"
+    "superagent": "*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+          "should": "*"
+  },
   "scripts": {
     "test": "mocha"
   },

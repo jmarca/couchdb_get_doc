@@ -9,9 +9,9 @@
   },
   "development": {},
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/get_doc.js",
   "scripts": [
-    "index.js"
+    "lib/get_doc.js"
   ],
   "remotes": []
 }
