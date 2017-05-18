@@ -1,5 +1,7 @@
 # couchdb_get_doc
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jmarca/couchdb_get_doc.svg)](https://greenkeeper.io/)
+
 This is a utility to put a get a doc from couchdb
 
 It uses superagent.
