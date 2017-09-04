@@ -1,21 +1,25 @@
 /* global require console process describe it before after */
 
-var should = require('should')
-var superagent = require('superagent')
+const tap = require('tap')
 
-var getdoc = require('../.')
+const superagent = require('superagent')
 
+const make_getter = require('../.')
 
-var env = process.env;
-var cuser = env.COUCHDB_USER ;
-var cpass = env.COUCHDB_PASS ;
-var chost = env.COUCHDB_HOST || 'localhost';
-var cport = env.COUCHDB_PORT || 5984;
+const utils = require('./utils.js')
 
-var test_db ='test%2fget%2fdocs'
+const path    = require('path')
+const rootdir = path.normalize(__dirname)
+const config_okay = require('config_okay')
+const config_file = rootdir+'/../test.config.json'
+const config={}
 
-var couch = 'http://'+chost+':'+cport+'/'+test_db
-console.log('testing couchdb='+couch)
+const date = new Date()
+const inprocess_string = date.toISOString()+' inprocess'
+
+let cdb
+const test_db ='test%2fget%2fdocs'
+
 
 /**
  * create a test db, and populate it with data
@@ -28,7 +32,7 @@ console.log('testing couchdb='+couch)
  *
  */
 
-var doc = {"_id": "801245",
+const doc = {"_id": "801245",
                      "2006": {
                      },
                      "2007": {
@@ -80,65 +84,82 @@ var doc = {"_id": "801245",
                          "vdsraw_max_iterations": 0
                      }}
 
-describe('put',function(){
-    var created_locally=false
-    before(function(done){
-        // create a test db, the put data into it
-        superagent.put(couch)
-        .auth(cuser,cpass)
-        .end(function(e,r){
-            if(!e)
-                created_locally=true
-            //load a doc
-            var uri = couch+'/'+doc._id
-            var req = superagent.put(uri)
-                      .type('json')
-                      .set('accept','application/json')
-                      .auth(cuser,cpass)
-                      .send(doc)
-                      .end(function(e,r){
-                          if (e) return done(e)
-                          r.body.should.have.property('ok')
-                          r.body.should.have.property('rev')
-                          return done()
-                      })
+const docs  = {'docs':[{'_id':'doc1'
+                        ,foo:'bar'}
+                       ,{'_id':'doc2'
+                         ,'baz':'bat'}
+                       ,doc
+                   ]}
+
+
+function test_cb (t) {
+
+    const task = Object.assign({}
+                               ,config.couchdb
+                              )
+    const promised_getter = make_getter(task)
+
+    return promised_getter.then( getter =>{
+        return new Promise((resolve,reject)=>{
+            return getter(doc._id
+                          ,function(e,r){
+                              t.plan(4)
+                              console.log(e)
+                              console.log(r)
+                              t.notOk(e,'should not get error')
+                              t.ok(r,'got response')
+                              t.is(r._id,doc._id,'got the right doc id')
+                              // the only thing that doesn't match is the rev
+                              t.same(r,Object.assign(doc,{'_rev':r._rev})
+                                     ,'the whole doc matches except for revision number')
+                              resolve()
+                              return t.end()
+                          })
+        })
+    })
+
+}
+
+function test_promise (t) {
+    const localdoc = docs.docs[0]
+    const task = Object.assign({},config.couchdb)
+    return make_getter(task).then( getter =>{
+        return getter(localdoc._id)
+            .then( r => {
+                t.ok(r,'got a response')
+                const gotdoc = r.body
+                t.is(gotdoc._id,localdoc._id,'got right doc id')
+                t.same(gotdoc,Object.assign(localdoc,{'_rev':gotdoc._rev}),'the whole doc matches except for revision number')
+                t.end()
+                return null
             })
-        return null
+    })
+}
+
+
+config_okay(config_file)
+    .then(function(c){
+        config.couchdb = c.couchdb
+        return utils.create_tempdb(config)
+    })
+    .then(()=>{
+        return utils.populate_tempdb(config,docs)
+    })
+    .then( r => {
+        return tap.test('test getting a doc',test_promise)
     })
 
-    after(function(done){
-        if(!created_locally) return done()
+    .then( r => {
+        return tap.test('test getting a doc',test_cb)
+    })
 
-        // bail in development
-        //console.log(couch)
-        //return done()
-        var opts = {'uri':couch
-                   ,'method': "DELETE"
-                   ,'headers': {}
-                   };
-        superagent.del(couch)
-        .type('json')
-        .auth(cuser,cpass)
-        .end(function(e,r){
-            if(e) return done(e)
-            return done()
+    .then(function(tt){
+        console.log('done, tearing down')
+        utils.teardown(config,function(eeee,rrrr){
+            return tap.end()
         })
         return null
     })
-
-    it('should get a doc woth an id',function(done){
-        var getter = getdoc({cdb:test_db,
-                             cuser:cuser,
-                             cpass:cpass,
-                             chost:chost,
-                             cport:cport
-                            })
-        getter(doc._id,function(e,r){
-            should.not.exist(e)
-            r.should.have.property('_id',doc._id)
-            done()
-        })
-
+    .catch( function(e){
+        throw e
     })
-
-})

@@ -46,4 +46,5 @@ function teardown(config){
 }
 
 exports.create_tempdb = create_tempdb
+exports.populate_tempdb = populate_tempdb
 exports.teardown = teardown
