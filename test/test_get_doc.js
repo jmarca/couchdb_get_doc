@@ -97,25 +97,23 @@ function test_cb (t) {
     const task = Object.assign({}
                                ,config.couchdb
                               )
-    const promised_getter = make_getter(task)
+    const getter = make_getter(task)
 
-    return promised_getter.then( getter =>{
-        return new Promise((resolve,reject)=>{
-            return getter(doc._id
-                          ,function(e,r){
-                              t.plan(4)
-                              console.log(e)
-                              console.log(r)
-                              t.notOk(e,'should not get error')
-                              t.ok(r,'got response')
-                              t.is(r._id,doc._id,'got the right doc id')
-                              // the only thing that doesn't match is the rev
-                              t.same(r,Object.assign(doc,{'_rev':r._rev})
-                                     ,'the whole doc matches except for revision number')
-                              resolve()
-                              return t.end()
-                          })
-        })
+    return new Promise((resolve,reject)=>{
+        return getter(doc._id
+                      ,function(e,r){
+                          t.plan(4)
+                          console.log(e)
+                          console.log(r)
+                          t.notOk(e,'should not get error')
+                          t.ok(r,'got response')
+                          t.is(r._id,doc._id,'got the right doc id')
+                          // the only thing that doesn't match is the rev
+                          t.same(r,Object.assign(doc,{'_rev':r._rev})
+                                 ,'the whole doc matches except for revision number')
+                          resolve()
+                          return t.end()
+                      })
     })
 
 }
@@ -123,17 +121,16 @@ function test_cb (t) {
 function test_promise (t) {
     const localdoc = docs.docs[0]
     const task = Object.assign({},config.couchdb)
-    return make_getter(task).then( getter =>{
-        return getter(localdoc._id)
-            .then( r => {
-                t.ok(r,'got a response')
-                const gotdoc = r.body
-                t.is(gotdoc._id,localdoc._id,'got right doc id')
-                t.same(gotdoc,Object.assign(localdoc,{'_rev':gotdoc._rev}),'the whole doc matches except for revision number')
-                t.end()
-                return null
-            })
-    })
+    const getter = make_getter(task)
+    return getter(localdoc._id)
+        .then( r => {
+            t.ok(r,'got a response')
+            const gotdoc = r.body
+            t.is(gotdoc._id,localdoc._id,'got right doc id')
+            t.same(gotdoc,Object.assign(localdoc,{'_rev':gotdoc._rev}),'the whole doc matches except for revision number')
+            t.end()
+            return null
+        })
 }
 
 

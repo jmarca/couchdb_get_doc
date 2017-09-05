@@ -4,37 +4,61 @@ This is a utility to put a get a doc from couchdb
 
 It uses superagent.
 
-it is really simple.  just avoids some repeated code.
+It is really simple---just avoids some repeated code.
 
-The program is a function generator.  You call it with the name of the
+The program is a function generator.  You call it with an
 options object, including (required) the name of the db
 
 The program expects that the url, port, username, password are in
-environment variables.  If not, put them in the initialization object
+the options object.  Alternately, you can rely on a configuration
+file.
 
+The generated function can be used with a callback style, or with a
+promise style.
 
-The code says it all:
+The callback style looks like this:
 
 
 ```javascript
-function  get_doc(opts){
 
-    if(opts.cdb === undefined)
-        throw new Error('must define the {"cdb":"dbname"} option')
-    var cuser = env.COUCHDB_USER
-    var cpass = env.COUCHDB_PASS
-    var chost = env.COUCHDB_HOST  || '127.0.0.1'
-    var cport = env.COUCHDB_PORT || 5984
-    //  override env. vars
-    if(opts.cuser !== undefined) cuser = opts.cuser
-    if(opts.cpass !== undefined) cpass = opts.cpass
-    if(opts.chost !== undefined) chost = opts.chost
-    if(opts.cport !== undefined) cport = +opts.cport
+const configuration = {
+    "couchdb": {
+        "host": "127.0.0.1",
+        "port":5984,
+        "db":"bitchin_camaros",
+        "auth":{"username":"milkman",
+                "password":"drove it over from the bahamas"
+               }
+    }
+}
+
+const make_getter = require('couchdb_get_doc')
+
+const get_docs = make_getter(config.couchdb)
+
+... now you can use the getter to get docs ...
+
+get_docs("myid",function(e,doc){
+   if (e) { throw "die a horrible death" }
+   return do_stuff_with_document(doc)
+})
+
+// or using promise style
+
+get_docs("another_id")
+.then( doc => {
+   return do_stuff_with_document(doc)
+})
+
+// or async/await, if you're in an async function
+const doc = await get_docs("yadayada")
+return await do_stuff_with_document(doc)
+
 ```
 
-calling get_doc will return a function.  you can get dos with that
-function, one by one, by calling the function with a document id as
-the first argument, and a callback as the second.  The callback will
-be called with an error value, if any, and the requested document.  If
-there is no such doc in the db, then the second argument will contain
-the response from the db saying so.
+See the tests for exact details.  The basic utility of this code is
+that the document getter wraps up the couchdb database stuff just
+once, and then you can get documents all day long.  Because CouchDB
+isn't a stateful database, you don't have a connection or anything,
+I'm just saving the details about the host, port, database name, and
+optionally the username and password.
