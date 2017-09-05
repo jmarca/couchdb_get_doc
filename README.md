@@ -1,6 +1,15 @@
 # couchdb_get_doc
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/jmarca/couchdb_get_doc.svg)](https://greenkeeper.io/)
+[![Build
+Status](https://travis-ci.org/jmarca/couchdb_get_doc.svg?branch=master)](https://travis-ci.org/jmarca/couchdb_get_doc)
+[![Code
+Climate](https://codeclimate.com/github/jmarca/couchdb_get_doc/badges/gpa.svg)](https://codeclimate.com/github/jmarca/couchdb_get_doc)
+<a
+href="https://codeclimate.com/github/jmarca/couchdb_get_doc/coverage"><img
+src="https://codeclimate.com/github/jmarca/couchdb_get_doc/badges/coverage.svg"
+/></a>
+
 
 This is a utility to put a get a doc from couchdb
 
