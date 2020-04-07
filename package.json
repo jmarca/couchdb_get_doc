@@ -7,7 +7,7 @@
     "test": "test"
   },
   "dependencies": {
-    "superagent": "^5.1.0"
+    "superagent": "^5.2.2"
   },
   "devDependencies": {
     "config_okay": "^1.0.1",
