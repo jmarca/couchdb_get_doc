@@ -1,6 +1,6 @@
 # couchdb_get_doc
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/jmarca/couchdb_get_doc.svg)](https://greenkeeper.io/)
+
 [![Build
 Status](https://travis-ci.org/jmarca/couchdb_get_doc.svg?branch=master)](https://travis-ci.org/jmarca/couchdb_get_doc)
 [![Code
